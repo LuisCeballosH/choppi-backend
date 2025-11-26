@@ -12,8 +12,8 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Public } from 'src/auth/decorators/public/public.decorator';
+import { ProductPaginationDto } from './dto/product-pagination.dto';
 
 @Controller('products')
 export class ProductController {
@@ -26,7 +26,7 @@ export class ProductController {
 
   @Public()
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: ProductPaginationDto) {
     return this.productService.findAll(paginationDto);
   }
 

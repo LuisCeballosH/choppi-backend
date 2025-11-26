@@ -71,7 +71,6 @@ export class UserService {
       }
 
       const [users, total] = await queryBuilder.getManyAndCount();
-      console.log(users);
       // remove password from each user before returning
       for (const u of users) {
         // delete the password property so it's not exposed in the response

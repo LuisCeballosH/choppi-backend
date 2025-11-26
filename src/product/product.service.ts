@@ -5,8 +5,8 @@ import { Product } from './entities/product.entity';
 import { DataSource, In, Repository } from 'typeorm';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { StoreService } from 'src/store/store.service';
+import { ProductPaginationDto } from './dto/product-pagination.dto';
 
 @Injectable()
 export class ProductService {
@@ -45,8 +45,8 @@ export class ProductService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto) {
-    const { page, size, searchText, sortBy, order } = paginationDto;
+  async findAll(paginationDto: ProductPaginationDto) {
+    const { page, size, searchText, sortBy, order, storeId } = paginationDto;
     try {
       const queryBuilder = this.productRepository.createQueryBuilder('product');
 
@@ -58,6 +58,12 @@ export class ProductService {
           .orWhere('product.description ILIKE :searchText', {
             searchText: `%${searchText}%`,
           });
+      }
+
+      if (storeId) {
+        queryBuilder
+          .innerJoin('product.stores', 'store')
+          .andWhere('store.id = :storeId', { storeId });
       }
 
       if (sortBy) {
