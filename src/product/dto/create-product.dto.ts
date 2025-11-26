@@ -11,5 +11,5 @@ export class CreateProductDto {
 
   @IsString({ each: true })
   @IsArray()
-  stores: string[];
+  storeIds: string[];
 }

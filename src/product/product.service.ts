@@ -25,7 +25,9 @@ export class ProductService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const stores = await this.storeService.findMany(createProductDto.stores);
+      const stores = await this.storeService.findMany(
+        createProductDto.storeIds,
+      );
       const product = queryRunner.manager.create(Product, {
         ...createProductDto,
         stores,
