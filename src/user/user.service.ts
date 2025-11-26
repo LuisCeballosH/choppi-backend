@@ -34,9 +34,9 @@ export class UserService {
       await queryRunner.manager.save(user);
 
       await queryRunner.commitTransaction();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...rest } = user;
-      return rest;
+      const sanitized = { ...user } as Partial<User>;
+      delete sanitized.password;
+      return sanitized;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.commonService.handleDBExceptions(error);
@@ -50,8 +50,6 @@ export class UserService {
     try {
       const queryBuilder = this.userRepository.createQueryBuilder('user');
 
-      queryBuilder.leftJoinAndSelect('user.products', 'product');
-
       if (searchText) {
         queryBuilder
           .where('user.email ILIKE :searchText', {
@@ -63,17 +61,24 @@ export class UserService {
       }
 
       if (sortBy) {
-        queryBuilder.orderBy(`store.${sortBy}`, order);
+        queryBuilder.orderBy(`user.${sortBy}`, order);
       } else {
-        queryBuilder.orderBy('store.createdAt', 'DESC');
+        queryBuilder.orderBy('user.createdAt', 'DESC');
       }
 
       if (page && size) {
         queryBuilder.skip((page - 1) * size).take(size);
       }
 
-      const [stores, total] = await queryBuilder.getManyAndCount();
-      return { total, stores };
+      const [users, total] = await queryBuilder.getManyAndCount();
+      console.log(users);
+      // remove password from each user before returning
+      for (const u of users) {
+        // delete the password property so it's not exposed in the response
+        delete (u as Partial<User>).password;
+      }
+
+      return { total, users };
     } catch (error) {
       this.commonService.handleDBExceptions(error);
     }
@@ -94,10 +99,14 @@ export class UserService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      queryRunner.manager.merge(User, user, updateUserDto);
+      const data = { ...(updateUserDto as Partial<UpdateUserDto>) };
+      delete (data as Partial<UpdateUserDto>).password;
+      queryRunner.manager.merge(User, user, data);
       await queryRunner.manager.save(user);
       await queryRunner.commitTransaction();
-      return user;
+      const sanitized = { ...user } as Partial<User>;
+      delete sanitized.password;
+      return sanitized;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.commonService.handleDBExceptions(error);
