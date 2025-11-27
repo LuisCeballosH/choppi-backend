@@ -90,10 +90,7 @@ export class StoreService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      queryRunner.manager.merge(Store, store, {
-        ...updateStoreDto,
-        products: [],
-      });
+      queryRunner.manager.merge(Store, store, updateStoreDto);
       await queryRunner.manager.save(store);
       await queryRunner.commitTransaction();
       return store;
