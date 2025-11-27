@@ -40,6 +40,17 @@ export class Product {
   description: string;
 
   @ApiProperty({
+    example: 100,
+    description: 'Stock quantity of the product',
+    required: true,
+  })
+  @Column({
+    type: 'double precision',
+    default: 0,
+  })
+  stock: number;
+
+  @ApiProperty({
     type: [Store],
     description: 'Stores associated with the product',
     required: false,

@@ -20,6 +20,7 @@ export class Product1764027001737 implements Seeder {
         name: `Choppi Product ${id}`,
         description: `Description for Choppi Product ${id}`,
         stores: assignedStores,
+        stock: Math.floor(Math.random() * 100) + 1,
       };
     });
     await repository.save(products);
